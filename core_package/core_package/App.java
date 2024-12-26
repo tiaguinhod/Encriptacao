@@ -1,19 +1,23 @@
 package core_package;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Scanner;
 
-public class App {
-    public static void main(String[] args) {
-        int Opcao = 0;
 
-        // Criar o scanner fora do loop
+public class App {
+
+    public static void main(String[] args) {
+        int Opcao = 0; // Variável para armazenar a opção escolhida pelo utilizador
+
+        // Criar um scanner para entrada do utilizador
         Scanner scanner = new Scanner(System.in);
 
+        // Loop do menu principal
         do {
+            // Exibir menu de opções
             System.out.println("\nMenu:");
             System.out.println("1 - Gravar Ficheiro");
             System.out.println("2 - Ler Ficheiro");
@@ -22,103 +26,105 @@ public class App {
             System.out.println("0 - Terminar");
             System.out.print("\nEscolha (0-4): ");
 
-            // Validar entrada
+            // Validação da entrada do utilizador
             if (scanner.hasNextInt()) {
-                Opcao = scanner.nextInt();
+                Opcao = scanner.nextInt(); // Ler a opção
 
+                // Estrutura switch para executar a opção escolhida
                 switch (Opcao) {
                     case 1:
-                        GravarFicheiro();
+                        GravarFicheiro(); 
                         break;
                     case 2:
-                        LerFicheiro();
+                        LerFicheiro(); 
                         break;
                     case 3:
-                        EncriptarFicheiro();
+                        EncriptarFicheiro(); 
                         break;
                     case 4:
-                        DesencriptarFicheiro();
+                        DesencriptarFicheiro(); 
                         break;
                     case 0:
                         System.out.println("\nA Encerrar Programa...");
-                        scanner.close();
+                        scanner.close(); // Fecha o scanner
                         break;
                     default:
                         System.out.println("\nOpção inválida. Por favor, escolha um número entre 0 e 4.");
                         break;
                 }
             } else {
+                // Mensagem para entrada inválida
                 System.out.println("\nEntrada inválida. Por favor, insira um número entre 0 e 4.");
-                scanner.next();
+                scanner.next(); // Limpar entrada inválida
             }
-        } while (Opcao != 0);
+        } while (Opcao != 0); // Repetir até que a opção seja 0
     }
 
     //===========================================================
 
+    // Função para gravar texto em um ficheiro
     public static void GravarFicheiro() {
         Scanner sc = new Scanner(System.in);
 
-        // Solicitar o nome e o caminho completo do ficheiro
+        // Solicitar nome e caminho do ficheiro
         System.out.print("Introduza o nome, com o caminho completo, do ficheiro: ");
         String nomeFicheiro = sc.nextLine();
 
-        // Utilizar try-with-resources para garantir que o recurso será fechado
+        // Bloco try-with-resources para escrita no ficheiro
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeFicheiro))) {
             System.out.println("Introduza o texto a gravar no ficheiro (ENTER para terminar):");
             
             String conteudo;
-            while (!(conteudo = sc.nextLine()).isEmpty()) { // Enquanto a linha não estiver vazia
-                writer.write(conteudo);
-                writer.newLine(); // Adiciona uma nova linha no ficheiro
+            // Ler entrada do utilizador até encontrar uma linha vazia
+            while (!(conteudo = sc.nextLine()).isEmpty()) {
+                writer.write(conteudo); // Escrever no ficheiro
+                writer.newLine(); // Adicionar nova linha
             }
-
             System.out.println("Texto gravado com sucesso no ficheiro!");
         } catch (Exception e) {
             System.err.println("Ocorreu um erro ao gravar no ficheiro: " + e.getMessage());
         }
     }
 
+    // Função para ler um ficheiro
     private static void LerFicheiro(){
         Scanner sc = new Scanner(System.in);
     
-        // Solicitar o nome e o caminho completo do ficheiro
+        // Solicitar nome e caminho do ficheiro
         System.out.print("Introduza o nome, com o caminho completo, do ficheiro: ");
         String nomeFicheiro = sc.nextLine();
         
-        // Tentar abrir e ler o ficheiro
+        // Utilização do 'try' para leitura do ficheiro
         try (BufferedReader reader = new BufferedReader(new FileReader(nomeFicheiro))) {
             String conteudo;
             System.out.println("\nConteúdo do ficheiro:\n");
             while ((conteudo = reader.readLine()) != null) {
-                System.out.println(conteudo);
+                System.out.println(conteudo); // Exibir conteúdo do ficheiro
             }
         } catch (Exception e) {
             System.out.println("Erro ao ler o ficheiro: " + e.getMessage());
         }
     }
         
-   
+   // Função para encriptar texto em um ficheiro
     private static void EncriptarFicheiro() {
         Scanner sc = new Scanner(System.in);
 
+        // Solicitar nome do ficheiro
         System.out.print("Introduza o nome, com o caminho completo, do ficheiro: ");
         String nomeFicheiro = sc.nextLine();
 
-        int k = 3; // Chave inicial de encriptação
+        int k = 3; // Chave de encriptação
         StringBuilder strFinal = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(nomeFicheiro))) {
             String conteudo;
-            System.out.println("\nConteúdo do ficheiro:\n");
 
-            // Ler cada linha do ficheiro
             while ((conteudo = reader.readLine()) != null) {
                 if (!conteudo.isEmpty()) {
+                    conteudo = normalizeString(conteudo); // Normalizar texto
 
-                    conteudo = normalizeString(conteudo);  // Normalizar a string (com minúsculas)
-
-                    // Encriptar cada caractere
+                    // Método para encriptar cada caractere
                     for (char c : conteudo.toCharArray()) {
                         if (c >= 'a' && c <= 'z') {
                             int dc = c - 'a' + k;
@@ -131,10 +137,9 @@ public class App {
                     }
                 }
             }
-
             System.out.println("Texto encriptado: \n" + strFinal.toString());
 
-            // Gravar o texto encriptado no mesmo ficheiro
+            // Método para gravar texto encriptado
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeFicheiro))) {
                 writer.write(strFinal.toString());
                 System.out.println("Texto encriptado gravado com sucesso no ficheiro!");
@@ -147,54 +152,38 @@ public class App {
 
     }
 
-    private static String normalizeString(String input) {
-        //Colocar a string em minúsculas
-        return input.toLowerCase();
+    // Função para normalizar texto
+    private static String normalizeString(String input) {    
+        return input.toLowerCase(); // Conversão da string para minúsculas
     }
 
+    // Função para desencriptar texto
     private static void DesencriptarFicheiro(){
         Scanner sc = new Scanner(System.in);
-
-        // Solicitar o nome e o caminho completo do ficheiro
         System.out.print("Introduza o nome, com o caminho completo, do ficheiro: ");
         String nomeFicheiro = sc.nextLine();
 
-        int k = 3; // Chave inicial usada na encriptação
+        int k = 3; // Chave de desencriptação
         StringBuilder strFinal = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(nomeFicheiro))) {
             String conteudo;
 
-            // Ler cada linha do ficheiro
             while ((conteudo = reader.readLine()) != null) {
-                if (!conteudo.isEmpty()) {
-                    // Desencriptar cada caractere
-                    for (char c : conteudo.toCharArray()) {
-                        if (c >= 'a' && c <= 'z') {
-                            int dc = c - 'a' - k;
-                            if (dc < 0) {
-                                dc = dc + 26;
-                            }
-                            strFinal.append((char) (dc + 'a'));
-                            k = c - 'a';
-                        } else {
-                            strFinal.append(c);
-                        }
+                for (char c : conteudo.toCharArray()) {
+                    if (c >= 'a' && c <= 'z') {
+                        int dc = c - 'a' - k;
+                        if (dc < 0) dc += 26;
+                        strFinal.append((char) (dc + 'a'));
+                        k = c - 'a';
+                    } else {
+                        strFinal.append(c);
                     }
                 }
             }
-
-        System.out.println("Texto desencriptado: \n" + strFinal.toString());
-
-        // Gravar o texto desencriptado no mesmo ficheiro
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(nomeFicheiro))) {
-            writer.write(strFinal.toString());
-            System.out.println("Texto desencriptado gravado com sucesso no ficheiro!");
+            System.out.println("Texto desencriptado: \n" + strFinal.toString());
         } catch (Exception e) {
-            System.out.println("Erro ao gravar o ficheiro: " + e.getMessage());
+            System.out.println("Erro ao ler o ficheiro: " + e.getMessage());
         }
-    } catch (Exception e) {
-        System.out.println("Erro ao ler o ficheiro: " + e.getMessage());
-    }
     }
 }
